@@ -18,10 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 
 from settings import settings
+from rest_framework.authtoken import views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('app.api.urls')),
+    path('login', views.obtain_auth_token)
 
 ]
 

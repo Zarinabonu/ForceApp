@@ -2,9 +2,10 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, raise_errors_on_nested_writes
 
 from app.api.quater.serializers import QuaterSerializer
+from app.api.student.serializers import StudentSerializer
 from app.api.subject.serializers import SubjectSerializer
 from app.api.teacher.serializers import TeacherSerializer
-from app.model import Class, Teacher, ClassSubject, Subject, Quater
+from app.model import Class, Teacher, ClassSubject, Subject, Quater, ClassMember, Student
 
 
 class ClassSerializer(ModelSerializer):
@@ -15,7 +16,7 @@ class ClassSerializer(ModelSerializer):
         model = Class
         fields = ('teacher',
                   'teacher_id',
-                  'name')
+                  'name',)
 
     def update(self, instance, validated_data):
         raise_errors_on_nested_writes('update', self, validated_data)
@@ -93,3 +94,36 @@ class ClassSubjectSerializer(ModelSerializer):
 
         instance.save()
         return instance
+
+
+class ClassMemberSerializer(ModelSerializer):
+    class_id = ClassSerializer(read_only=True)
+    student = StudentSerializer(read_only=True)
+    class_id_id = serializers.IntegerField(write_only=True)
+    student_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = ClassMember
+        fields = ('class_id',
+                  'class_id_id',
+                  'student_id',
+                  'student')
+
+    def update(self, instance, validated_data):
+        raise_errors_on_nested_writes('update', self, validated_data)
+
+        if validated_data.get('class_id_id'):
+            p = validated_data.pop('class_id_id')
+            t = Class.objects.get(id=p)
+            instance.class_id = t
+            instance.class_id.save()
+        if validated_data.get('student_id'):
+            p = validated_data.pop('student_id')
+            s = Student.objects.get(id=p)
+            instance.student = s
+            instance.student.save()
+
+        instance.save()
+
+        return instance
+

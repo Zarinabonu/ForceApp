@@ -6,5 +6,6 @@ urlpatterns = [
     path('teacher/', include('app.api.teacher.urls')),
     path('class/', include('app.api.class_.urls')),
     path('subject/', include('app.api.subject.urls')),
+    path('mark/', include('app.api.mark.urls')),
 
 ]

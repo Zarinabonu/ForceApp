@@ -8,3 +8,6 @@ from .parent import Parent
 from .student import Student
 from .subject import Subject, Quater
 from .teacher import Teacher
+from .news import News
+from .school import School
+from .homework import Homework

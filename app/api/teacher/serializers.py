@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, raise_errors_on_nested_writes
 
-from app.model import Teacher, Account
+from app.api.account.serializers import AccountSerializer
+from app.api.subject.serializers import SubjectListSerializer
+from app.model import Teacher, Account, Subject
 
 
 class TeacherSerializer(ModelSerializer):
@@ -50,3 +52,18 @@ class TeacherSerializer(ModelSerializer):
         instance.save()
 
         return instance
+
+
+class TeacherSerializer(ModelSerializer):
+    account = AccountSerializer(read_only=True)
+    subject_set = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Teacher
+        fields = ('id',
+                  'account',
+                  'subject_set')
+
+    def get_subject_set(self, obj):
+        qs = Subject.objects.filter(classsubject__teacher=obj)
+        return SubjectListSerializer(qs, many=True, context=self.context).data

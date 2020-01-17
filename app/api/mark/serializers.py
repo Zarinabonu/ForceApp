@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, raise_errors_on_nested_writes
 
 from app.api.class_.serializers import ClassMemberSerializer, ClassSubjectSerializer
+from app.api.subject.serializers import SubjectListSerializer
 from app.model import Marks, ClassMember, ClassSubject, Subject
 
 
@@ -36,3 +37,14 @@ class MarkSerializer(ModelSerializer):
         instance.save()
 
         return instance
+
+
+class MarkListSerializer(ModelSerializer):
+    class_subject = SubjectListSerializer(read_only=True)
+
+    class Meta:
+        model = Marks
+        fields = ('id',
+                  'class_subject',
+                  'mark',
+                  'is_finil')

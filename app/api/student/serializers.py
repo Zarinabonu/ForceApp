@@ -1,7 +1,17 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, raise_errors_on_nested_writes
 
-from app.model import Student, Account
+from app.api.account.urls import AccountSerializer
+from app.api.attandance.serializers import AttandanceListSerializer
+from app.api.class_.serializers import ClassListSerializer
+from app.api.homework.serializers import HomeworkListSerializer
+from app.api.mark.serializers import MarkListSerializer
+from app.api.notification.serializers import NotificationListSerializer
+from app.api.school.serializers import SchoolListSerializer
+from app.api.subject.serializers import SubjectSerializer
+from app.api.teacher.serializers import TeacherSerializer
+from app.model import Student, Account, Class, Attandance, Marks, Homework, Subject, ClassSubject, Teacher, Notification
+from app.model.school import School
 
 
 class StudentSerializer(ModelSerializer):
@@ -50,6 +60,59 @@ class StudentSerializer(ModelSerializer):
         instance.save()
 
         return instance
+
+
+class StudentListSerializer(ModelSerializer):
+    account = AccountSerializer(read_only=True)
+    own_class = serializers.SerializerMethodField()
+    own_school = serializers.SerializerMethodField()
+    attandance_set = serializers.SerializerMethodField()
+    mark_set = serializers.SerializerMethodField()
+    subject_set = serializers.SerializerMethodField()
+    teacher_set = serializers.SerializerMethodField()
+    notification_set = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Student
+        fields = ('id',
+                  'account',
+                  'own_class',
+                  'own_school',
+                  'attandance_set',
+                  'mark_set',
+                  'subject_set',
+                  'teacher_set',
+                  'notification_set')
+
+    def get_own_class(self, obj):
+        qs = Class.objects.filter(classmember__student=obj)
+        return ClassListSerializer(qs, many=True, context=self.context).data
+
+    def get_own_school(self, obj):
+        qs = School.objects.filter(student=obj)
+        return SchoolListSerializer(qs, many=True, context=self.context).data
+
+    def get_attandance_set(self, obj):
+        qs = Attandance.objects.filter(student=obj)
+        return AttandanceListSerializer(qs, many=True, context=self.context).data
+
+    def get_mark_set(self, obj):
+        qs = Marks.objects.filter(class_member__student=obj)
+        return MarkListSerializer(qs, many=True, context=self.context).data
+
+    def get_subject_set(self, obj):
+        c = Class.objects.get(classmember__student=obj)
+        qs = Homework.objects.filter(class_subject__class_id=c)
+        return HomeworkListSerializer(qs, many=True, context=self.context).data
+
+    def get_teacher_set(self, obj):
+        qs = Teacher.objects.filter(account__student=obj)
+        return TeacherSerializer(qs, many=True, context=self.context).data
+
+    def get_notification_set(self, obj):
+        qs = Notification.objects.all().order_by('-created')
+        return NotificationListSerializer(qs, many=True, context=self.context).data
+
 
 
 

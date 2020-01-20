@@ -8,5 +8,6 @@ urlpatterns = [
     path('subject/', include('app.api.subject.urls')),
     path('mark/', include('app.api.mark.urls')),
     path('news/', include('app.api.news.urls')),
+    path('statistic/', include('app.api.statistic.urls')),
 
 ]

@@ -6,7 +6,7 @@ from app.api.subject.serializers import SubjectListSerializer
 from app.model import Teacher, Account, Subject
 
 
-class TeacherSerializer(ModelSerializer):
+class TeacherCSerializer(ModelSerializer):
     f_name = serializers.CharField(max_length=100, write_only=True)
     l_name = serializers.CharField(max_length=100, write_only=True)
     m_name = serializers.CharField(max_length=100, write_only=True)

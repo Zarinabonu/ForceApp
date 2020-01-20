@@ -21,6 +21,7 @@ class StudentSerializer(ModelSerializer):
     phone = serializers.IntegerField(write_only=True)
     photo = serializers.ImageField(write_only=True)
     address = serializers.CharField(max_length=200, write_only=True)
+    school = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Student
@@ -30,7 +31,7 @@ class StudentSerializer(ModelSerializer):
                   'phone',
                   'photo',
                   'address',
-                  )
+                  'school')
 
     def create(self, validated_data):
         first_name = validated_data.pop('f_name')
